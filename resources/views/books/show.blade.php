@@ -1074,7 +1074,7 @@
                 </button>
                 <button @click="prevPage()" :disabled="currentPage == 0" class="ebook-btn ebook-btn-primary disabled:opacity-40 disabled:cursor-not-allowed">
                     <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                    Prev
+                    <span class="btn-text">Prev</span>
                 </button>
             </div>
 
@@ -1089,11 +1089,9 @@
                 </strong>
             </div>
 
-
-
             <div class="ebook-reader-control-group">
                 <button @click="nextPage()" :disabled="currentPage == totalPages - 1" class="ebook-btn ebook-btn-primary disabled:opacity-40 disabled:cursor-not-allowed">
-                    Next
+                    <span class="btn-text">Next</span>
                     <i data-lucide="chevron-right" class="w-4 h-4"></i>
                 </button>
                 <button @click="goToPage(totalPages - 1)" :disabled="currentPage == totalPages - 1" class="ebook-icon-btn disabled:opacity-40 disabled:cursor-not-allowed" title="Last Page">

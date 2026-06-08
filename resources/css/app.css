@@ -420,7 +420,29 @@ button, input, select, textarea { font: inherit; }
     .ebook-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
     .ebook-title { font-size: 25px; }
     .ebook-reader-stage { min-height: 520px; padding: 16px; }
-    .ebook-reader-controls { flex-direction: column; }
+    .ebook-reader-controls {
+        flex-direction: row;
+        padding: 8px 12px;
+        gap: 8px;
+        margin-top: 14px;
+        width: 100%;
+    }
+    .ebook-reader-controls .btn-text {
+        display: none;
+    }
+    .ebook-reader-controls .ebook-btn {
+        padding: 8px 12px;
+        min-height: 36px;
+    }
+    .ebook-reader-page-label {
+        min-width: auto;
+    }
+    .ebook-reader-page-label span:first-child {
+        display: none;
+    }
+    .ebook-reader-page-label strong {
+        font-size: 13px;
+    }
 }
 @media (max-width: 520px) {
     .ebook-grid { grid-template-columns: 1fr; }
