@@ -14,6 +14,7 @@ use Illuminate\Validation\Rule;
 class AdminBookController extends Controller
 {
     private const GRADE_LEVELS = [
+        'Kindergarten',
         'Kinder 1',
         'Kinder 2',
         'Grade 1',

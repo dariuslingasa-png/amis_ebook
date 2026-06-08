@@ -26,6 +26,7 @@
     @else
         @php
             $gradeTabs = [
+                ['label' => 'KINDERGARTEN', 'key' => 'kindergarten'],
                 ['label' => 'KINDER 1', 'key' => 'kinder-1'],
                 ['label' => 'KINDER 2', 'key' => 'kinder-2'],
                 ['label' => 'GRADE 1', 'key' => 'grade-1'],
