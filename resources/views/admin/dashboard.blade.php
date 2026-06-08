@@ -28,10 +28,10 @@
         </article>
         <article class="ebook-stat">
             <span class="ebook-stat-icon bg-sky-50 text-sky-700">
-                <i data-lucide="eye" class="w-6 h-6"></i>
+                <i data-lucide="book-open" class="w-6 h-6"></i>
             </span>
             <div>
-                <span>Reader Views</span>
+                <span>Reader Reads</span>
                 <strong>{{ $totalViews }}</strong>
             </div>
         </article>
@@ -121,7 +121,7 @@
                     @forelse($recentLogs as $log)
                         <article class="flex gap-3">
                             <span class="ebook-stat-icon {{ $log->action === 'stream' ? 'bg-violet-50 text-violet-700' : 'bg-sky-50 text-sky-700' }}" style="width:34px;height:34px;flex-basis:34px;border-radius:10px;">
-                                <i data-lucide="{{ $log->action === 'stream' ? 'file-down' : 'eye' }}" class="w-4 h-4"></i>
+                                <i data-lucide="{{ $log->action === 'stream' ? 'file-down' : 'book-open' }}" class="w-4 h-4"></i>
                             </span>
                             <div class="min-w-0">
                                 <p class="m-0 text-sm font-bold text-gray-900">

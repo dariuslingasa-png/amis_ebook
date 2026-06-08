@@ -31,8 +31,8 @@
                 <span class="text-[9px] font-extrabold uppercase tracking-wider text-emerald-700 bg-emerald-50/80 border border-emerald-100/60 px-2 py-0.5 rounded-md">
                     {{ $book->grade_level }}
                 </span>
-                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400" title="Total Views">
-                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400" title="Total Reads">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
                     <span>{{ $book->views_count ?? 0 }}</span>
                 </span>
             </div>
