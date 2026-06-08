@@ -49,6 +49,9 @@
                 scrollStartX: 0,
                 scrollStartY: 0,
                 isPanning: false,
+                isPinching: false,
+                initialPinchDistance: 0,
+                initialPinchZoom: 1.0,
 
                 // Right-Click Context Menu State
                 showContextMenu: false,
@@ -174,6 +177,16 @@
                 },
 
                 startPan(e) {
+                    if (e.touches && e.touches.length === 2) {
+                        this.isPinching = true;
+                        this.initialPinchDistance = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                        );
+                        this.initialPinchZoom = this.zoom;
+                        return;
+                    }
+
                     if (this.zoom <= 1) return;
                     this.isPanning = true;
                     
@@ -199,6 +212,20 @@
                 },
                 
                 pan(e) {
+                    if (e.touches && e.touches.length === 2 && this.isPinching) {
+                        e.preventDefault();
+                        const currentDistance = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                        );
+                        const factor = currentDistance / this.initialPinchDistance;
+                        let targetZoom = Math.min(2.5, Math.max(1.0, this.initialPinchZoom * factor));
+                        
+                        this.zoom = parseFloat(targetZoom.toFixed(2));
+                        this.updateSheetStyles();
+                        return;
+                    }
+
                     if (!this.isPanning || this.zoom <= 1) return;
                     
                     if (e.cancelable) {
@@ -225,6 +252,7 @@
                 },
                 
                 endPan() {
+                    this.isPinching = false;
                     if (panFrame) {
                         cancelAnimationFrame(panFrame);
                         panFrame = null;
