@@ -11,38 +11,18 @@ use Illuminate\Support\Facades\Storage;
 class BookController extends Controller
 {
     /**
-     * Show ebook catalog for students/teachers based on permissions.
+     * Show the public ebook catalog.
      */
     public function index()
     {
         $user = Auth::user();
 
-        if ($user->role === 'admin') {
-            // Admins see all ebooks
+        if ($user?->role === 'admin') {
             $books = Ebook::with('creator')->orderBy('title')->get();
-
-        } elseif ($user->role === 'student') {
-            // Students see ebooks matching their grade level (plain text comparison)
-            $student    = $user->student;
-            $gradeLevel = $student?->grade_level; // e.g. "Grade 4"
-
-            $studentGradeKey = $this->gradeKey($gradeLevel);
-
-            $books = $studentGradeKey
-                ? Ebook::where('status', 'published')
-                    ->orderBy('title')
-                    ->get()
-                    ->filter(fn (Ebook $book) => $this->gradeKey($book->grade_level) === $studentGradeKey)
-                    ->values()
-                : collect();
-
-        } elseif ($user->role === 'teacher') {
-            // Subject assignment was removed from eBooks; teachers see all published books.
+        } else {
             $books = Ebook::where('status', 'published')
                 ->orderBy('title')
                 ->get();
-        } else {
-            $books = collect();
         }
 
         return view('books.index', compact('books'));
@@ -55,7 +35,6 @@ class BookController extends Controller
     {
         $this->authorizeAccess($book);
 
-        // Generate a temporary signed URL that expires in 10 minutes
         $streamUrl = URL::temporarySignedRoute(
             'ebooks.stream',
             now()->addMinutes(10),
@@ -92,34 +71,21 @@ class BookController extends Controller
     }
 
     /**
-     * Validates that the logged in user has permission to read this ebook.
+     * Validates that the requested ebook is public or the logged in user is an admin.
      */
     protected function authorizeAccess(Ebook $book): void
     {
         $user = Auth::user();
 
-        // Admin always has full access
-        if ($user->role === 'admin') {
+        if ($user?->role === 'admin') {
             return;
         }
 
-        // Student: match by grade_level text
-        if ($user->role === 'student') {
-            $student = $user->student;
-            $studentGrade = $this->gradeKey($student?->grade_level);
-            $bookGrade    = $this->gradeKey($book->grade_level);
-
-            if ($studentGrade && $bookGrade && $studentGrade === $bookGrade) {
-                return;
-            }
-            abort(403, 'Access denied. This ebook is not assigned to your grade level.');
-        }
-
-        if ($user->role === 'teacher') {
+        if ($book->status === 'published') {
             return;
         }
 
-        abort(403, 'Access denied. Unauthorized role.');
+        abort(404);
     }
 
     /**
@@ -127,6 +93,10 @@ class BookController extends Controller
      */
     protected function logAccess(Ebook $book, string $action): void
     {
+        if (! Auth::check()) {
+            return;
+        }
+
         EbookAccessLog::create([
             'ebook_id'   => $book->id,
             'user_id'    => Auth::id(),

@@ -7,8 +7,8 @@
     <header class="ebook-page-header">
         <div>
             <p class="ebook-eyebrow">Digital Library</p>
-            <h1 class="ebook-title">My Assigned eBooks</h1>
-            <p class="ebook-subtitle">Open your AMIS learning materials with secure reader access and grade-level assignment controls.</p>
+            <h1 class="ebook-title">AMIS eBooks</h1>
+            <p class="ebook-subtitle">Open AMIS learning materials with secure reader access.</p>
         </div>
         <span class="ebook-tag ebook-tag-emerald">
             <i data-lucide="book-copy" class="w-3.5 h-3.5"></i>
@@ -21,8 +21,8 @@
             <span class="ebook-empty-icon">
                 <i data-lucide="folder-open" class="w-7 h-7"></i>
             </span>
-            <h3>No assigned eBooks found</h3>
-            <p>There are no eBooks assigned to your grade level yet.</p>
+            <h3>No eBooks found</h3>
+            <p>There are no published eBooks available yet.</p>
         </section>
     @else
         @php
@@ -116,7 +116,7 @@
                                     Open eBook
                                 </a>
 
-                                @if($book->is_downloadable || Auth::user()->role === 'admin')
+                                @if($book->is_downloadable || Auth::user()?->role === 'admin')
                                     @php
                                         $downloadUrl = URL::temporarySignedRoute(
                                             'ebooks.stream',

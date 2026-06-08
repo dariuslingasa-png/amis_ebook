@@ -26,12 +26,12 @@
                 </a>
 
                 <nav class="ebook-nav">
-                    @auth
-                        <a href="{{ route('books.index') }}" class="ebook-nav-link {{ request()->routeIs('books.*') ? 'is-active' : '' }}">
-                            <i data-lucide="library" class="w-4 h-4"></i>
-                            Catalog
-                        </a>
+                    <a href="{{ route('books.index') }}" class="ebook-nav-link {{ request()->routeIs('books.*') ? 'is-active' : '' }}">
+                        <i data-lucide="library" class="w-4 h-4"></i>
+                        Catalog
+                    </a>
 
+                    @auth
                         @if(Auth::user()->role === 'admin')
                             <a href="{{ route('admin.books.index') }}" class="ebook-nav-link {{ request()->routeIs('admin.books.index') ? 'is-active' : '' }}">
                                 <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
@@ -46,11 +46,6 @@
                                 Sign Out
                             </button>
                         </form>
-                    @else
-                        <a href="{{ route('login') }}" class="ebook-nav-link">
-                            <i data-lucide="log-in" class="w-4 h-4"></i>
-                            Sign In
-                        </a>
                     @endauth
                 </nav>
             </div>

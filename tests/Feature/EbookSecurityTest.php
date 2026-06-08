@@ -116,10 +116,10 @@ class EbookSecurityTest extends TestCase
         ]);
     }
 
-    public function test_guest_is_redirected_to_login(): void
+    public function test_guest_can_view_public_catalog(): void
     {
         $response = $this->get(route('books.index'));
-        $response->assertRedirect(route('login'));
+        $response->assertStatus(200);
     }
 
     public function test_admin_can_upload_ebook_to_private_storage(): void
@@ -171,19 +171,19 @@ class EbookSecurityTest extends TestCase
 
         $this->actingAs($this->studentUser);
 
-        // Catalog should see Grade 4 book, but NOT Grade 5 book
+        // Public catalog shows all published books; grade tabs filter client-side.
         $response = $this->get(route('books.index'));
         $response->assertStatus(200);
         $response->assertSee('Grade 4 Science');
-        $response->assertDontSee('Grade 5 Math');
+        $response->assertSee('Grade 5 Math');
 
         // Accessing Grade 4 book reader is allowed
         $response = $this->get(route('books.show', $grade4Book->id));
         $response->assertStatus(200);
 
-        // Accessing Grade 5 book reader is blocked
+        // Published books are public, even if the student grade differs.
         $response = $this->get(route('books.show', $grade5Book->id));
-        $response->assertStatus(403);
+        $response->assertStatus(200);
     }
 
     public function test_teacher_can_access_all_published_ebooks(): void
@@ -273,6 +273,22 @@ class EbookSecurityTest extends TestCase
             'user_id' => $this->studentUser->id,
             'action' => 'stream',
         ]);
+    }
+
+    public function test_guest_can_open_published_ebook_reader(): void
+    {
+        $book = Ebook::create([
+            'title' => 'Public Book',
+            'grade_level' => 'Grade 4',
+            'file_path' => 'private/ebooks/public.pdf',
+            'created_by' => $this->adminUser->id,
+            'status' => 'published',
+        ]);
+
+        $response = $this->get(route('books.show', $book->id));
+
+        $response->assertStatus(200);
+        $response->assertSee('Public Book');
     }
 
     public function test_sso_auto_login_from_admin_session_cookie(): void

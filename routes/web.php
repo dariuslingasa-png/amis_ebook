@@ -44,19 +44,17 @@ Route::get('/sso-debug', function (\Illuminate\Http\Request $request) {
     ]);
 });
 
-// Authenticated E-Book Module
-Route::middleware('auth')->group(function () {
-    
-    // Student & Teacher Catalog & Viewing
-    Route::get('/books', [BookController::class, 'index'])->name('books.index');
-    Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
-    
-    // Secure private PDF streaming (requires signed temporary URL validation)
-    Route::get('/ebooks/stream/{ebook}', [BookController::class, 'stream'])
-        ->name('ebooks.stream')
-        ->middleware('signed');
+// Public E-Book Catalog & Viewing
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
 
-    // Admin Ebook Catalog & Management
+// Secure private PDF streaming (requires signed temporary URL validation)
+Route::get('/ebooks/stream/{ebook}', [BookController::class, 'stream'])
+    ->name('ebooks.stream')
+    ->middleware('signed');
+
+// Admin Ebook Catalog & Management
+Route::middleware('auth')->group(function () {
     Route::prefix('admin')->middleware('admin')->group(function () {
         Route::get('/books', [AdminBookController::class, 'index'])->name('admin.books.index');
         Route::get('/books/create', [AdminBookController::class, 'create'])->name('admin.books.create');
