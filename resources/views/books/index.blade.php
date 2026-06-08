@@ -156,7 +156,8 @@
             try {
                 const loadingTask = pdfjsLib.getDocument({
                     url: canvas.dataset.pdfPreview,
-                    disableAutoFetch: true
+                    disableAutoFetch: true,
+                    disableStream: true
                 });
                 pdf = await loadingTask.promise;
 
