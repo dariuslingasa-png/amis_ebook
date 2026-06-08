@@ -22,7 +22,9 @@ class BookController extends Controller
         $query = Ebook::select([
             'id', 'title', 'description', 'grade_level',
             'cover_image_path', 'is_downloadable', 'status',
-        ]);
+        ])->withCount(['logs as views_count' => function ($query) {
+            $query->where('action', 'view');
+        }]);
 
         if (!$isAdmin) {
             $query->where('status', 'published');

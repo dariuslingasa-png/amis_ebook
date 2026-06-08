@@ -1078,15 +1078,19 @@
                 </button>
             </div>
 
-            <div class="ebook-reader-page-label select-none">
-                <span>Pages</span>
-                <strong>
-                    <span x-text="'Page ' + (currentPage + 1)"></span>
-                    <span x-show="orientation === 'landscape' && currentPage > 0 && currentPage + 1 < totalPages">
-                        - <span x-text="'Page ' + (currentPage + 2)"></span>
+            <div class="ebook-reader-page-label select-none flex items-center justify-center gap-1.5">
+                <span class="btn-text">Page</span>
+                <input type="number" 
+                       :value="currentPage + 1" 
+                       @change="let val = parseInt($event.target.value, 10); if(val > 0 && val <= totalPages) { goToPage(val - 1); } else { $event.target.value = currentPage + 1; }"
+                       class="w-12 h-7 text-center rounded-lg border border-slate-300 bg-white font-black text-sm text-emerald-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                >
+                <template x-if="orientation === 'landscape' && currentPage > 0 && currentPage + 1 < totalPages">
+                    <span class="font-extrabold text-slate-700">
+                        - <span x-text="currentPage + 2"></span>
                     </span>
-                    <span class="text-xs text-slate-400 font-bold ml-1">/ <span x-text="totalPages"></span></span>
-                </strong>
+                </template>
+                <span class="text-xs text-slate-400 font-bold">/ <span x-text="totalPages"></span></span>
             </div>
 
             <div class="ebook-reader-control-group">
