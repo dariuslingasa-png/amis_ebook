@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'eBook Catalog'])
+@extends('layouts.app', ['title' => 'AMIS eBook Portal'])
 
 @section('content')
 
