@@ -4,13 +4,19 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\AdminBookController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SsoController;
 
-// Auth Routes
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+// Keep the login route name for Laravel auth redirects, but never show a login portal.
+Route::redirect('/login', '/books')->name('login');
+Route::post('/login', fn () => redirect()->route('books.index'));
+Route::post('/logout', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Auth::logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect()->route('books.index');
+})->name('logout');
 
 // SSO Routes (no CSRF — server-to-server token issue + browser redirect)
 Route::withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])->group(function () {
