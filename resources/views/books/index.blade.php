@@ -29,18 +29,18 @@
             $gradeTabs = [
                 ['label' => 'KINDER 1', 'key' => 'kinder-1'],
                 ['label' => 'KINDER 2', 'key' => 'kinder-2'],
-                ['label' => 'G1', 'key' => 'grade-1'],
-                ['label' => 'G2', 'key' => 'grade-2'],
-                ['label' => 'G3', 'key' => 'grade-3'],
-                ['label' => 'G4', 'key' => 'grade-4'],
-                ['label' => 'G5', 'key' => 'grade-5'],
-                ['label' => 'G6', 'key' => 'grade-6'],
-                ['label' => 'G7', 'key' => 'grade-7'],
-                ['label' => 'G8', 'key' => 'grade-8'],
-                ['label' => 'G9', 'key' => 'grade-9'],
-                ['label' => 'G10', 'key' => 'grade-10'],
-                ['label' => 'K11', 'key' => 'grade-11'],
-                ['label' => 'K12', 'key' => 'grade-12'],
+                ['label' => 'GRADE 1', 'key' => 'grade-1'],
+                ['label' => 'GRADE 2', 'key' => 'grade-2'],
+                ['label' => 'GRADE 3', 'key' => 'grade-3'],
+                ['label' => 'GRADE 4', 'key' => 'grade-4'],
+                ['label' => 'GRADE 5', 'key' => 'grade-5'],
+                ['label' => 'GRADE 6', 'key' => 'grade-6'],
+                ['label' => 'GRADE 7', 'key' => 'grade-7'],
+                ['label' => 'GRADE 8', 'key' => 'grade-8'],
+                ['label' => 'GRADE 9', 'key' => 'grade-9'],
+                ['label' => 'GRADE 10', 'key' => 'grade-10'],
+                ['label' => 'GRADE 11', 'key' => 'grade-11'],
+                ['label' => 'GRADE 12', 'key' => 'grade-12'],
             ];
 
             $gradeKey = function ($grade) {
@@ -81,61 +81,67 @@
                 @endforeach
             </div>
 
-            <section class="ebook-grid">
-                @foreach($books as $book)
+            <!-- Grouped view for 'ALL' tab -->
+            <div x-show="selectedGrade === 'all'" class="space-y-10">
+                @php
+                    $hasBooks = false;
+                @endphp
+                @foreach($gradeTabs as $grade)
                     @php
-                        $bookGrade = trim($book->grade_level ?? '');
-                        $bookGradeKey = $gradeKey($bookGrade);
-                        $previewUrl = URL::temporarySignedRoute(
-                            'ebooks.stream',
-                            now()->addMinutes(30),
-                            ['ebook' => $book->id, 'preview' => 1]
-                        );
+                        $gradeBooks = $books->filter(fn($b) => $gradeKey($b->grade_level) === $grade['key']);
                     @endphp
-                    <article class="ebook-card ebook-book-card"
-                             x-show="selectedGrade === 'all' || selectedGrade === {{ Js::from($bookGradeKey) }}">
-                        <div class="ebook-cover ebook-pdf-cover">
-                            <canvas class="ebook-cover-canvas"
-                                    data-pdf-preview="{{ $previewUrl }}"
-                                    aria-label="{{ $book->title }} first page preview"></canvas>
-                            <div class="ebook-cover-placeholder"></div>
+                    @if($gradeBooks->isNotEmpty())
+                        @php $hasBooks = true; @endphp
+                        <div class="ebook-grade-section border-t border-slate-100 pt-6 first:border-0 first:pt-0">
+                            <h2 class="mb-5 text-sm font-black uppercase tracking-wider text-slate-400 flex items-center gap-2 select-none">
+                                <i data-lucide="graduation-cap" class="w-4 h-4 text-emerald-600"></i>
+                                {{ $grade['label'] }}
+                            </h2>
+                            <section class="ebook-grid">
+                                @foreach($gradeBooks as $book)
+                                    @include('books.partials.card', ['book' => $book, 'gradeKey' => $gradeKey])
+                                @endforeach
+                            </section>
                         </div>
-
-                        <div class="ebook-book-body">
-                            <div>
-                                <div class="mb-2 flex flex-wrap gap-1">
-                                    <span class="ebook-tag ebook-tag-emerald text-[10px] uppercase font-bold tracking-wider">
-                                        {{ $book->grade_level }}
-                                    </span>
-                                </div>
-                                <h2 class="ebook-book-title" title="{{ $book->title }}">{{ $book->title }}</h2>
-                                <p class="ebook-book-desc">{{ $book->description ?: 'No description provided.' }}</p>
-                            </div>
-
-                            <div class="flex flex-col gap-2 mt-auto">
-                                <a href="{{ route('books.show', $book->id) }}" class="ebook-btn ebook-btn-primary w-full">
-                                    <i data-lucide="book-open" class="w-4 h-4"></i>
-                                    Open eBook
-                                </a>
-
-                                @if($book->is_downloadable || Auth::user()?->role === 'admin')
-                                    @php
-                                        $downloadUrl = URL::temporarySignedRoute(
-                                            'ebooks.stream',
-                                            now()->addMinutes(15),
-                                            ['ebook' => $book->id]
-                                        );
-                                    @endphp
-                                    <a href="{{ $downloadUrl }}" download class="ebook-btn ebook-btn-muted w-full">
-                                        <i data-lucide="download" class="w-4 h-4"></i>
-                                        Download PDF
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </article>
+                    @endif
                 @endforeach
-            </section>
+                
+                @if(!$hasBooks)
+                    <section class="ebook-empty">
+                        <span class="ebook-empty-icon">
+                            <i data-lucide="folder-open" class="w-7 h-7"></i>
+                        </span>
+                        <h3>No eBooks found</h3>
+                        <p>There are no published eBooks available yet.</p>
+                    </section>
+                @endif
+            </div>
+
+            <!-- Filtered view for specific grade tabs -->
+            <div x-show="selectedGrade !== 'all'">
+                @foreach($gradeTabs as $grade)
+                    @php
+                        $gradeBooks = $books->filter(fn($b) => $gradeKey($b->grade_level) === $grade['key']);
+                    @endphp
+                    <div x-show="selectedGrade === {{ Js::from($grade['key']) }}">
+                        @if($gradeBooks->isEmpty())
+                            <section class="ebook-empty">
+                                <span class="ebook-empty-icon">
+                                    <i data-lucide="folder-open" class="w-7 h-7"></i>
+                                </span>
+                                <h3>No eBooks found</h3>
+                                <p>There are no published eBooks available for {{ $grade['label'] }} yet.</p>
+                            </section>
+                        @else
+                            <section class="ebook-grid">
+                                @foreach($gradeBooks as $book)
+                                    @include('books.partials.card', ['book' => $book, 'gradeKey' => $gradeKey])
+                                @endforeach
+                            </section>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
         </div>
     @endif
 </div>
