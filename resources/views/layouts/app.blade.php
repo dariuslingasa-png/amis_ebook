@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'AMIS eBook Portal' }}</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/AMIS_Logo.png') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/AMIS_Logo.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Naskh+Arabic:wght@600;700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
         <header class="ebook-topbar">
             <div class="ebook-topbar-inner">
                 <a href="{{ route('books.index') }}" class="ebook-brand">
-                    <img src="{{ asset('images/AMIS_Logo.png') }}" alt="AMIS Logo">
+                    <img src="{{ asset('images/AMIS_Logo.svg') }}" alt="AMIS Logo">
                     <span>
                         <strong>AMIS</strong>
                         <small>eBook</small>
