@@ -98,14 +98,16 @@
                             <canvas class="ebook-cover-canvas"
                                     data-pdf-preview="{{ $previewUrl }}"
                                     aria-label="{{ $book->title }} first page preview"></canvas>
-                            <div class="ebook-cover-placeholder">
-                                <i data-lucide="book-open" class="w-12 h-12"></i>
-                                Loading
-                            </div>
+                            <div class="ebook-cover-placeholder"></div>
                         </div>
 
                         <div class="ebook-book-body">
                             <div>
+                                <div class="mb-2 flex flex-wrap gap-1">
+                                    <span class="ebook-tag ebook-tag-emerald text-[10px] uppercase font-bold tracking-wider">
+                                        {{ $book->grade_level }}
+                                    </span>
+                                </div>
                                 <h2 class="ebook-book-title" title="{{ $book->title }}">{{ $book->title }}</h2>
                                 <p class="ebook-book-desc">{{ $book->description ?: 'No description provided.' }}</p>
                             </div>
@@ -156,8 +158,7 @@
             try {
                 const loadingTask = pdfjsLib.getDocument({
                     url: canvas.dataset.pdfPreview,
-                    disableAutoFetch: true,
-                    disableStream: true
+                    disableAutoFetch: true
                 });
                 pdf = await loadingTask.promise;
 

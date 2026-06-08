@@ -174,7 +174,31 @@ button, input, select, textarea { font: inherit; }
     display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
 }
 .ebook-cover img { width: 100%; height: 100%; object-fit: cover; }
-.ebook-cover-placeholder { color: #9ca3af; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .45px; }
+.ebook-cover-placeholder {
+    position: absolute;
+    inset: 0;
+    background: #e2e8f0;
+    overflow: hidden;
+}
+.ebook-cover-placeholder::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.45) 20%,
+        rgba(255, 255, 255, 0.45) 60%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: ebook-shimmer 1.5s infinite;
+}
+@keyframes ebook-shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
 .ebook-cover-canvas { width: 100%; height: 100%; object-fit: contain; background: #fff; opacity: 0; transition: opacity 140ms var(--ease); }
 .ebook-pdf-cover.is-loaded .ebook-cover-canvas { opacity: 1; }
 .ebook-pdf-cover.is-loaded .ebook-cover-placeholder { display: none; }
