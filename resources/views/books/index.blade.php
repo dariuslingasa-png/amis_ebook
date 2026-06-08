@@ -63,7 +63,27 @@
             };
         @endphp
 
-        <div x-data="{ selectedGrade: 'all', viewMode: 'grouped' }" class="ebook-catalog-list">
+        <div x-data="{ 
+            selectedGrade: 'all', 
+            viewMode: 'grouped', 
+            search: '',
+            booksList: {{ Js::from($books->map(fn($b) => [
+                'id' => $b->id,
+                'title' => strtolower($b->title),
+                'desc' => strtolower($b->description ?? ''),
+                'grade' => $gradeKey($b->grade_level)
+            ])->toArray()) }},
+            hasMatches() {
+                const q = this.search.toLowerCase().trim();
+                if (q === '') return true;
+                return this.booksList.some(b => {
+                    if (this.selectedGrade !== 'all' && b.grade !== this.selectedGrade) {
+                        return false;
+                    }
+                    return b.title.includes(q) || b.desc.includes(q);
+                });
+            }
+        }" class="ebook-catalog-list">
             <div class="ebook-grade-tabs" role="tablist" aria-label="Grade filter">
                 <button type="button"
                         class="ebook-grade-tab"
@@ -81,9 +101,25 @@
                 @endforeach
             </div>
 
-            <!-- View Mode Toggle (Only visible when 'All' tab is selected) -->
-            <div x-show="selectedGrade === 'all'" class="flex justify-end mb-6">
-                <div class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/60 select-none shadow-sm">
+            <!-- Search and View Mode Toggle -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                <!-- Search bar -->
+                <div class="relative w-full max-w-md">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+                        <i data-lucide="search" class="w-4 h-4"></i>
+                    </span>
+                    <input type="text" 
+                           x-model="search" 
+                           placeholder="Search ebooks by title..." 
+                           class="w-full h-11 pl-10 pr-10 rounded-xl border border-slate-200/80 bg-white text-sm font-semibold outline-none transition-all focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100"
+                    >
+                    <button x-show="search" @click="search = ''" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 cursor-pointer">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Toggle (Only visible when 'All' tab is selected) -->
+                <div x-show="selectedGrade === 'all'" class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/60 select-none shadow-sm self-start md:self-auto">
                     <button type="button" 
                             class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-150 cursor-pointer"
                             :class="viewMode === 'grouped' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
@@ -102,7 +138,7 @@
             </div>
 
             <!-- Grouped view for 'ALL' tab -->
-            <div x-show="selectedGrade === 'all' && viewMode === 'grouped'" class="space-y-10">
+            <div x-show="selectedGrade === 'all' && viewMode === 'grouped' && hasMatches()" class="space-y-10">
                 @php
                     $hasBooks = false;
                 @endphp
@@ -112,7 +148,8 @@
                     @endphp
                     @if($gradeBooks->isNotEmpty())
                         @php $hasBooks = true; @endphp
-                        <div class="ebook-grade-section border-t border-slate-100 pt-6 first:border-0 first:pt-0">
+                        <div class="ebook-grade-section border-t border-slate-100 pt-6 first:border-0 first:pt-0"
+                             x-show="search === '' || {{ Js::from($gradeBooks->map(fn($b) => strtolower($b->title) . ' ' . strtolower($b->description ?? ''))->toArray()) }}.some(t => t.includes(search.toLowerCase()))">
                             <div class="flex items-center gap-3 mb-6 select-none">
                                 <span class="h-px flex-1 bg-slate-200/80"></span>
                                 <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-slate-200/60 shadow-sm">
@@ -142,7 +179,7 @@
             </div>
 
             <!-- Flat view for 'ALL' tab (shows all books in a single grid without group dividers) -->
-            <div x-show="selectedGrade === 'all' && viewMode === 'flat'">
+            <div x-show="selectedGrade === 'all' && viewMode === 'flat' && hasMatches()">
                 <section class="ebook-grid">
                     @foreach($books as $book)
                         @include('books.partials.card', ['book' => $book, 'gradeKey' => $gradeKey])
@@ -156,7 +193,7 @@
                     @php
                         $gradeBooks = $books->filter(fn($b) => $gradeKey($b->grade_level) === $grade['key']);
                     @endphp
-                    <div x-show="selectedGrade === {{ Js::from($grade['key']) }}">
+                    <div x-show="selectedGrade === {{ Js::from($grade['key']) }} && hasMatches()">
                         @if($gradeBooks->isEmpty())
                             <section class="ebook-empty">
                                 <span class="ebook-empty-icon">
@@ -174,6 +211,15 @@
                         @endif
                     </div>
                 @endforeach
+            </div>
+
+            <!-- No search results fallback -->
+            <div x-show="!hasMatches()" x-cloak class="ebook-empty py-12">
+                <span class="ebook-empty-icon">
+                    <i data-lucide="search" class="w-7 h-7"></i>
+                </span>
+                <h3>No eBooks match your search</h3>
+                <p>Try checking the spelling or searching for a different grade level.</p>
             </div>
         </div>
     @endif

@@ -3,7 +3,8 @@
     $bookGradeKey = $gradeKey($bookGrade);
     $coverUrl = $book->cover_url;
 @endphp
-<article class="ebook-card ebook-book-card">
+<article class="ebook-card ebook-book-card"
+         x-show="search === '' || {{ Js::from(strtolower($book->title)) }}.includes(search.toLowerCase()) || {{ Js::from(strtolower($book->description ?? '')) }}.includes(search.toLowerCase())">
     <div class="ebook-cover">
         @if($coverUrl)
             <img src="{{ $coverUrl }}"
