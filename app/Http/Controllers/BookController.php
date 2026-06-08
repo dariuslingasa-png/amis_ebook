@@ -24,13 +24,11 @@ class BookController extends Controller
             'cover_image_path', 'is_downloadable', 'status',
         ]);
 
-        if ($isAdmin) {
-            $query->orderBy('title');
-        } else {
-            $query->where('status', 'published')->orderBy('title');
+        if (!$isAdmin) {
+            $query->where('status', 'published');
         }
 
-        $books = $query->get();
+        $books = $query->get()->sortBy('title', SORT_NATURAL | SORT_FLAG_CASE)->values();
 
         return view('books.index', compact('books'));
     }
