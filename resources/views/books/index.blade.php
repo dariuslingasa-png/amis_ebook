@@ -62,7 +62,7 @@
             };
         @endphp
 
-        <div x-data="{ selectedGrade: 'all' }" class="ebook-catalog-list">
+        <div x-data="{ selectedGrade: 'all', viewMode: 'grouped' }" class="ebook-catalog-list">
             <div class="ebook-grade-tabs" role="tablist" aria-label="Grade filter">
                 <button type="button"
                         class="ebook-grade-tab"
@@ -80,8 +80,28 @@
                 @endforeach
             </div>
 
+            <!-- View Mode Toggle (Only visible when 'All' tab is selected) -->
+            <div x-show="selectedGrade === 'all'" class="flex justify-end mb-6">
+                <div class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/60 select-none shadow-sm">
+                    <button type="button" 
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-150 cursor-pointer"
+                            :class="viewMode === 'grouped' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+                            @click="viewMode = 'grouped'">
+                        <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                        Grouped by Grade
+                    </button>
+                    <button type="button" 
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all duration-150 cursor-pointer"
+                            :class="viewMode === 'flat' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+                            @click="viewMode = 'flat'">
+                        <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+                        All Books
+                    </button>
+                </div>
+            </div>
+
             <!-- Grouped view for 'ALL' tab -->
-            <div x-show="selectedGrade === 'all'" class="space-y-10">
+            <div x-show="selectedGrade === 'all' && viewMode === 'grouped'" class="space-y-10">
                 @php
                     $hasBooks = false;
                 @endphp
@@ -118,6 +138,15 @@
                         <p>There are no published eBooks available yet.</p>
                     </section>
                 @endif
+            </div>
+
+            <!-- Flat view for 'ALL' tab (shows all books in a single grid without group dividers) -->
+            <div x-show="selectedGrade === 'all' && viewMode === 'flat'">
+                <section class="ebook-grid">
+                    @foreach($books as $book)
+                        @include('books.partials.card', ['book' => $book, 'gradeKey' => $gradeKey])
+                    @endforeach
+                </section>
             </div>
 
             <!-- Filtered view for specific grade tabs -->
