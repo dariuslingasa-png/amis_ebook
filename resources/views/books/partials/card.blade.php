@@ -18,7 +18,7 @@
     <div class="ebook-book-body">
         <div>
             <div class="mb-2 flex flex-wrap gap-1">
-                <span class="ebook-tag ebook-tag-emerald text-[10px] uppercase font-bold tracking-wider">
+                <span class="text-[9px] font-extrabold uppercase tracking-wider text-emerald-700 bg-emerald-50/80 border border-emerald-100/60 px-2 py-0.5 rounded-md select-none">
                     {{ $book->grade_level }}
                 </span>
             </div>

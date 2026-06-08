@@ -93,10 +93,14 @@
                     @if($gradeBooks->isNotEmpty())
                         @php $hasBooks = true; @endphp
                         <div class="ebook-grade-section border-t border-slate-100 pt-6 first:border-0 first:pt-0">
-                            <h2 class="mb-5 text-sm font-black uppercase tracking-wider text-slate-400 flex items-center gap-2 select-none">
-                                <i data-lucide="graduation-cap" class="w-4 h-4 text-emerald-600"></i>
-                                {{ $grade['label'] }}
-                            </h2>
+                            <div class="flex items-center gap-3 mb-6 select-none">
+                                <span class="h-px flex-1 bg-slate-200/80"></span>
+                                <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-slate-200/60 shadow-sm">
+                                    <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                    {{ $grade['label'] }}
+                                </h2>
+                                <span class="h-px flex-1 bg-slate-200/80"></span>
+                            </div>
                             <section class="ebook-grid">
                                 @foreach($gradeBooks as $book)
                                     @include('books.partials.card', ['book' => $book, 'gradeKey' => $gradeKey])
