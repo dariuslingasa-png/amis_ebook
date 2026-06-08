@@ -12,12 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ebooks', function (Blueprint $table) {
-            try {
-                $table->dropIndex(['status', 'grade_level', 'subject']);
-            } catch (Throwable $e) {
-                //
-            }
-
             if (Schema::hasColumn('ebooks', 'subject')) {
                 $table->dropColumn('subject');
             }

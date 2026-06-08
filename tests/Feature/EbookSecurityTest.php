@@ -132,10 +132,8 @@ class EbookSecurityTest extends TestCase
         $response = $this->post(route('admin.books.store'), [
             'title' => 'Science Grade 4 Textbook',
             'description' => 'Official textbook',
-            'grade_level_id' => $this->grade4->id,
-            'subject_id' => $this->scienceSub->id,
+            'grade_level' => 'Grade 4',
             'pdf_file' => $pdf,
-            'cover_image' => $cover,
             'status' => 'published',
         ]);
 
@@ -156,8 +154,7 @@ class EbookSecurityTest extends TestCase
         // 1. Create a Grade 4 book
         $grade4Book = Ebook::create([
             'title' => 'Grade 4 Science',
-            'grade_level_id' => $this->grade4->id,
-            'subject_id' => $this->scienceSub->id,
+            'grade_level' => 'Grade 4',
             'file_path' => 'private/ebooks/g4.pdf',
             'created_by' => $this->adminUser->id,
             'status' => 'published',
@@ -166,8 +163,7 @@ class EbookSecurityTest extends TestCase
         // 2. Create a Grade 5 book
         $grade5Book = Ebook::create([
             'title' => 'Grade 5 Math',
-            'grade_level_id' => $this->grade5->id,
-            'subject_id' => $this->scienceSub->id,
+            'grade_level' => 'Grade 5',
             'file_path' => 'private/ebooks/g5.pdf',
             'created_by' => $this->adminUser->id,
             'status' => 'published',
@@ -190,13 +186,12 @@ class EbookSecurityTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function test_teacher_can_only_access_assigned_subject_ebook(): void
+    public function test_teacher_can_access_all_published_ebooks(): void
     {
         // 1. Create a Science Book (Taught by teacher)
         $scienceBook = Ebook::create([
             'title' => 'Science Textbook',
-            'grade_level_id' => $this->grade4->id,
-            'subject_id' => $this->scienceSub->id,
+            'grade_level' => 'Grade 4',
             'file_path' => 'private/ebooks/sci.pdf',
             'created_by' => $this->adminUser->id,
             'status' => 'published',
@@ -205,8 +200,7 @@ class EbookSecurityTest extends TestCase
         // 2. Create an Arabic Book (NOT taught by teacher)
         $arabicBook = Ebook::create([
             'title' => 'Arabic Textbook',
-            'grade_level_id' => $this->grade4->id,
-            'subject_id' => $this->arabicSub->id,
+            'grade_level' => 'Grade 4',
             'file_path' => 'private/ebooks/ara.pdf',
             'created_by' => $this->adminUser->id,
             'status' => 'published',
@@ -214,27 +208,26 @@ class EbookSecurityTest extends TestCase
 
         $this->actingAs($this->teacherUser);
 
-        // Catalog should see Science but NOT Arabic
+        // Subject assignment was removed from eBooks, so teachers see all published books.
         $response = $this->get(route('books.index'));
         $response->assertStatus(200);
         $response->assertSee('Science Textbook');
-        $response->assertDontSee('Arabic Textbook');
+        $response->assertSee('Arabic Textbook');
 
         // Reading Science book is allowed
         $response = $this->get(route('books.show', $scienceBook->id));
         $response->assertStatus(200);
 
-        // Reading Arabic book is blocked
+        // Reading Arabic book is also allowed
         $response = $this->get(route('books.show', $arabicBook->id));
-        $response->assertStatus(403);
+        $response->assertStatus(200);
     }
 
     public function test_unsigned_stream_route_fails_for_pdf_file(): void
     {
         $book = Ebook::create([
             'title' => 'Assigned Book',
-            'grade_level_id' => $this->grade4->id,
-            'subject_id' => $this->scienceSub->id,
+            'grade_level' => 'Grade 4',
             'file_path' => 'private/ebooks/book.pdf',
             'created_by' => $this->adminUser->id,
             'status' => 'published',
@@ -253,8 +246,7 @@ class EbookSecurityTest extends TestCase
     {
         $book = Ebook::create([
             'title' => 'Assigned Book',
-            'grade_level_id' => $this->grade4->id,
-            'subject_id' => $this->scienceSub->id,
+            'grade_level' => 'Grade 4',
             'file_path' => 'private/ebooks/book.pdf',
             'created_by' => $this->adminUser->id,
             'status' => 'published',
