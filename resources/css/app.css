@@ -470,7 +470,7 @@ button, input, select, textarea { font: inherit; }
     }
 }
 @media (max-width: 520px) {
-    .ebook-grid { grid-template-columns: 1fr; }
+    .ebook-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .ebook-login { padding: 24px 16px; align-items: flex-start; }
     .ebook-login-panel { padding: 30px 22px; }
     .ebook-login-panel h2 { font-size: 26px; }
