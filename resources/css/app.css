@@ -413,8 +413,33 @@ button, input, select, textarea { font: inherit; }
     .ebook-login-identity > p:not(.ebook-arabic) { margin: 18px auto 0; font-size: 16px; }
 }
 @media (max-width: 760px) {
-    .ebook-topbar-inner, .ebook-page-header { align-items: flex-start; flex-direction: column; }
-    .ebook-nav { justify-content: flex-start; }
+    .ebook-topbar-inner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+    }
+    .ebook-brand img {
+        width: 34px;
+        height: 34px;
+    }
+    .ebook-brand strong {
+        font-size: 16px;
+    }
+    .ebook-brand small {
+        font-size: 10px;
+        margin-top: 1px;
+    }
+    .ebook-nav {
+        justify-content: flex-end;
+        gap: 6px;
+    }
+    .ebook-nav-link, .ebook-nav-button {
+        min-height: 34px;
+        padding: 6px 10px;
+        font-size: 12.5px;
+    }
+    .ebook-page-header { align-items: flex-start; flex-direction: column; }
     .ebook-main { padding: 22px 14px 34px; }
     .ebook-stats, .ebook-form-grid { grid-template-columns: 1fr; }
     .ebook-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
