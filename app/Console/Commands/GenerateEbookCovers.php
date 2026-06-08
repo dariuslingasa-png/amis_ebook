@@ -122,7 +122,7 @@ class GenerateEbookCovers extends Command
 
         // Try cwebp first (produces better WebP compression)
         $cwebpCmd = sprintf(
-            'cwebp -q 80 -resize 600 0 %s -o %s 2>&1',
+            'cwebp -q 60 -resize 400 0 %s -o %s 2>&1',
             escapeshellarg($tempPngPath),
             escapeshellarg($webpAbsolutePath)
         );
@@ -136,7 +136,7 @@ class GenerateEbookCovers extends Command
         // Fallback: try ImageMagick convert
         if (! $converted) {
             $convertCmd = sprintf(
-                'convert %s -resize 600x -quality 80 %s 2>&1',
+                'convert %s -resize 400x -quality 60 %s 2>&1',
                 escapeshellarg($tempPngPath),
                 escapeshellarg($webpAbsolutePath)
             );

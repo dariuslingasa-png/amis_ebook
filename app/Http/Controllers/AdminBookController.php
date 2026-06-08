@@ -68,7 +68,7 @@ class AdminBookController extends Controller
             'description'    => 'nullable|string',
             'grade_level'    => ['required', 'string', Rule::in(self::GRADE_LEVELS)],
             'pdf_file'       => 'required|file|mimes:pdf|max:51200', // max 50MB
-            'cover_image'    => 'nullable|file|mimes:jpg,jpeg,png,webp|max:5120',
+            'cover_image'    => 'nullable|file|mimes:jpg,jpeg,png,webp|max:1024',
             'is_downloadable'=> 'nullable|boolean',
             'status'         => 'required|string|in:draft,published',
         ]);
@@ -128,7 +128,7 @@ class AdminBookController extends Controller
             'description'    => 'nullable|string',
             'grade_level'    => ['required', 'string', Rule::in(self::GRADE_LEVELS)],
             'pdf_file'       => 'nullable|file|mimes:pdf|max:51200',
-            'cover_image'    => 'nullable|file|mimes:jpg,jpeg,png,webp|max:5120',
+            'cover_image'    => 'nullable|file|mimes:jpg,jpeg,png,webp|max:1024',
             'is_downloadable'=> 'nullable|boolean',
             'status'         => 'required|string|in:draft,published',
         ]);
@@ -214,7 +214,7 @@ class AdminBookController extends Controller
 
         // Try to convert to WebP using ImageMagick convert
         $convertCmd = sprintf(
-            'convert %s -resize 600x -quality 80 %s 2>&1',
+            'convert %s -resize 400x -quality 60 %s 2>&1',
             escapeshellarg($tempPath),
             escapeshellarg($targetPath)
         );
@@ -283,7 +283,7 @@ class AdminBookController extends Controller
 
         // Try cwebp first
         $cwebpCmd = sprintf(
-            'cwebp -q 80 -resize 600 0 %s -o %s 2>&1',
+            'cwebp -q 60 -resize 400 0 %s -o %s 2>&1',
             escapeshellarg($tempPngPath),
             escapeshellarg($webpAbsolutePath)
         );
@@ -296,7 +296,7 @@ class AdminBookController extends Controller
         // Fallback: ImageMagick convert
         if (! $converted) {
             $convertCmd = sprintf(
-                'convert %s -resize 600x -quality 80 %s 2>&1',
+                'convert %s -resize 400x -quality 60 %s 2>&1',
                 escapeshellarg($tempPngPath),
                 escapeshellarg($webpAbsolutePath)
             );
