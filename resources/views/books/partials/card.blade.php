@@ -2,6 +2,7 @@
     $bookGrade = trim($book->grade_level ?? '');
     $bookGradeKey = $gradeKey($bookGrade);
     $coverUrl = $book->cover_url;
+    $displayGrade ??= $bookGradeKey === 'kindergarten' ? 'KINDER 1 / KINDER 2' : $bookGrade;
 @endphp
 <article class="ebook-card ebook-book-card"
          x-show="search === '' || {{ Js::from(strtolower($book->title)) }}.includes(search.toLowerCase()) || {{ Js::from(strtolower($book->description ?? '')) }}.includes(search.toLowerCase())">
@@ -29,7 +30,7 @@
         <div>
             <div class="mb-2 flex items-center justify-between gap-1 select-none">
                 <span class="text-[9px] font-extrabold uppercase tracking-wider text-emerald-700 bg-emerald-50/80 border border-emerald-100/60 px-2 py-0.5 rounded-md">
-                    {{ $book->grade_level }}
+                    {{ $displayGrade }}
                 </span>
                 <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400" title="Total Reads">
                     <i data-lucide="book-open" class="w-3.5 h-3.5"></i>

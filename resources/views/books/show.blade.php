@@ -959,7 +959,13 @@
             <p class="ebook-eyebrow">Reader</p>
             <h1 class="ebook-title">{{ $book->title }}</h1>
             @php
-                $bookMeta = collect([$book->grade_level])
+                $bookGrade = strtolower(trim($book->grade_level ?? ''));
+                $bookGrade = preg_replace('/\s+/', ' ', $bookGrade);
+                $displayGrade = $bookGrade === 'kindergarten'
+                    ? 'KINDER 1 / KINDER 2'
+                    : $book->grade_level;
+
+                $bookMeta = collect([$displayGrade])
                     ->filter(fn ($value) => filled($value))
                     ->implode(' · ');
             @endphp

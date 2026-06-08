@@ -26,7 +26,6 @@
     @else
         @php
             $gradeTabs = [
-                ['label' => 'KINDERGARTEN', 'key' => 'kindergarten'],
                 ['label' => 'KINDER 1', 'key' => 'kinder-1'],
                 ['label' => 'KINDER 2', 'key' => 'kinder-2'],
                 ['label' => 'GRADE 1', 'key' => 'grade-1'],
@@ -47,6 +46,10 @@
                 $grade = strtolower(trim($grade ?? ''));
                 $grade = preg_replace('/\s+/', ' ', $grade);
 
+                if ($grade === 'kindergarten') {
+                    return 'kindergarten';
+                }
+
                 if (preg_match('/^kinder\s*([12])$/', $grade, $match)) {
                     return 'kinder-' . $match[1];
                 }
@@ -61,6 +64,25 @@
 
                 return $grade;
             };
+
+            $gradeKeys = function ($grade) use ($gradeKey) {
+                $key = $gradeKey($grade);
+
+                return $key === 'kindergarten' ? ['kinder-1', 'kinder-2'] : [$key];
+            };
+
+            $gradeLabel = function ($grade, ?string $contextKey = null) use ($gradeKey) {
+                $key = $contextKey ?: $gradeKey($grade);
+
+                return match ($key) {
+                    'kindergarten' => 'KINDER 1 / KINDER 2',
+                    'kinder-1' => 'KINDER 1',
+                    'kinder-2' => 'KINDER 2',
+                    'grade-11' => 'GRADE 11',
+                    'grade-12' => 'GRADE 12',
+                    default => strtoupper(str_replace('-', ' ', (string) $key)),
+                };
+            };
         @endphp
 
         <div x-data="{ 
@@ -71,13 +93,13 @@
                 'id' => $b->id,
                 'title' => strtolower($b->title),
                 'desc' => strtolower($b->description ?? ''),
-                'grade' => $gradeKey($b->grade_level)
+                'grades' => $gradeKeys($b->grade_level)
             ])->toArray()) }},
             hasMatches() {
                 const q = this.search.toLowerCase().trim();
                 if (q === '') return true;
                 return this.booksList.some(b => {
-                    if (this.selectedGrade !== 'all' && b.grade !== this.selectedGrade) {
+                    if (this.selectedGrade !== 'all' && !b.grades.includes(this.selectedGrade)) {
                         return false;
                     }
                     return b.title.includes(q) || b.desc.includes(q);
@@ -144,7 +166,7 @@
                 @endphp
                 @foreach($gradeTabs as $grade)
                     @php
-                        $gradeBooks = $books->filter(fn($b) => $gradeKey($b->grade_level) === $grade['key']);
+                        $gradeBooks = $books->filter(fn($b) => in_array($grade['key'], $gradeKeys($b->grade_level), true));
                     @endphp
                     @if($gradeBooks->isNotEmpty())
                         @php $hasBooks = true; @endphp
@@ -160,7 +182,11 @@
                             </div>
                             <section class="ebook-grid">
                                 @foreach($gradeBooks as $book)
-                                    @include('books.partials.card', ['book' => $book, 'gradeKey' => $gradeKey])
+                                    @include('books.partials.card', [
+                                        'book' => $book,
+                                        'gradeKey' => $gradeKey,
+                                        'displayGrade' => $gradeLabel($book->grade_level, $grade['key']),
+                                    ])
                                 @endforeach
                             </section>
                         </div>
@@ -182,7 +208,11 @@
             <div x-show="selectedGrade === 'all' && viewMode === 'flat' && hasMatches()">
                 <section class="ebook-grid">
                     @foreach($books as $book)
-                        @include('books.partials.card', ['book' => $book, 'gradeKey' => $gradeKey])
+                        @include('books.partials.card', [
+                            'book' => $book,
+                            'gradeKey' => $gradeKey,
+                            'displayGrade' => $gradeLabel($book->grade_level),
+                        ])
                     @endforeach
                 </section>
             </div>
@@ -191,7 +221,7 @@
             <div x-show="selectedGrade !== 'all'">
                 @foreach($gradeTabs as $grade)
                     @php
-                        $gradeBooks = $books->filter(fn($b) => $gradeKey($b->grade_level) === $grade['key']);
+                        $gradeBooks = $books->filter(fn($b) => in_array($grade['key'], $gradeKeys($b->grade_level), true));
                     @endphp
                     <div x-show="selectedGrade === {{ Js::from($grade['key']) }} && hasMatches()">
                         @if($gradeBooks->isEmpty())
@@ -205,7 +235,11 @@
                         @else
                             <section class="ebook-grid">
                                 @foreach($gradeBooks as $book)
-                                    @include('books.partials.card', ['book' => $book, 'gradeKey' => $gradeKey])
+                                    @include('books.partials.card', [
+                                        'book' => $book,
+                                        'gradeKey' => $gradeKey,
+                                        'displayGrade' => $gradeLabel($book->grade_level, $grade['key']),
+                                    ])
                                 @endforeach
                             </section>
                         @endif
