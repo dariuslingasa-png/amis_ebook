@@ -125,7 +125,7 @@
                             </span>
                             <div class="min-w-0">
                                 <p class="m-0 text-sm font-bold text-gray-900">
-                                    {{ $log->user->name ?? 'Unknown User' }}
+                                    {{ $log->user->name ?? 'Guest' }}
                                     <span class="font-semibold text-gray-500">{{ $log->action === 'stream' ? 'streamed' : 'read' }}</span>
                                 </p>
                                 <p class="m-0 truncate text-xs font-semibold text-emerald-700">{{ $log->ebook->title ?? 'Deleted Book' }}</p>

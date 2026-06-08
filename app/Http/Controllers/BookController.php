@@ -100,10 +100,6 @@ class BookController extends Controller
      */
     protected function logAccess(Ebook $book, string $action): void
     {
-        if (! Auth::check()) {
-            return;
-        }
-
         EbookAccessLog::create([
             'ebook_id'   => $book->id,
             'user_id'    => Auth::id(),
