@@ -1,18 +1,27 @@
 @php
     $bookGrade = trim($book->grade_level ?? '');
     $bookGradeKey = $gradeKey($bookGrade);
-    $previewUrl = URL::temporarySignedRoute(
-        'ebooks.stream',
-        now()->addMinutes(30),
-        ['ebook' => $book->id, 'preview' => 1]
-    );
+    $coverUrl = $book->cover_url;
 @endphp
 <article class="ebook-card ebook-book-card">
-    <div class="ebook-cover ebook-pdf-cover">
-        <canvas class="ebook-cover-canvas"
-                data-pdf-preview="{{ $previewUrl }}"
-                aria-label="{{ $book->title }} first page preview"></canvas>
-        <div class="ebook-cover-placeholder"></div>
+    <div class="ebook-cover">
+        @if($coverUrl)
+            <img src="{{ $coverUrl }}"
+                 alt="{{ $book->title }} cover"
+                 loading="lazy"
+                 width="400" height="533"
+                 class="ebook-cover-img"
+                 onload="this.parentElement.classList.add('is-loaded')"
+                 onerror="this.style.display='none'; this.parentElement.classList.add('is-error')">
+            <div class="ebook-cover-placeholder"></div>
+        @else
+            <div class="ebook-cover-fallback">
+                <span class="ebook-cover-fallback-icon">
+                    <i data-lucide="book-open" class="w-8 h-8"></i>
+                </span>
+                <span class="ebook-cover-fallback-title">{{ $book->title }}</span>
+            </div>
+        @endif
     </div>
 
     <div class="ebook-book-body">

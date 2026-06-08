@@ -176,16 +176,28 @@ button, input, select, textarea { font: inherit; }
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    padding: 0;
     overflow: hidden;
     position: relative;
 }
-.ebook-cover img { width: 100%; height: 100%; object-fit: cover; }
+.ebook-cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 250ms var(--ease);
+    position: relative;
+    z-index: 2;
+}
+.ebook-cover.is-loaded .ebook-cover-img { opacity: 1; }
+.ebook-cover.is-loaded .ebook-cover-placeholder { display: none; }
+.ebook-cover.is-error .ebook-cover-placeholder { display: none; }
 .ebook-cover-placeholder {
     position: absolute;
     inset: 0;
     background: #e2e8f0;
     overflow: hidden;
+    z-index: 1;
 }
 .ebook-cover-placeholder::after {
     content: "";
@@ -206,18 +218,39 @@ button, input, select, textarea { font: inherit; }
         transform: translateX(100%);
     }
 }
-.ebook-cover-canvas {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    background: #fff;
-    border-radius: 4px;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.14), 0 2px 4px rgba(0,0,0,0.08);
-    opacity: 0;
-    transition: opacity 200ms var(--ease);
+.ebook-cover-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 20px;
+    background: linear-gradient(145deg, #065f46 0%, #047857 40%, #059669 100%);
+    text-align: center;
 }
-.ebook-pdf-cover.is-loaded .ebook-cover-canvas { opacity: 1; }
-.ebook-pdf-cover.is-loaded .ebook-cover-placeholder { display: none; }
+.ebook-cover-fallback-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.9);
+}
+.ebook-cover-fallback-title {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.3;
+    max-width: 160px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
 .ebook-book-body { padding: 16px; display: flex; flex-direction: column; gap: 13px; flex: 1; }
 .ebook-book-title { margin: 0; font-size: 16px; line-height: 1.25; font-weight: 850; color: var(--t-primary); }
 .ebook-book-desc { margin: 0; color: var(--t-secondary); font-size: 13px; line-height: 1.55; font-weight: 550; }

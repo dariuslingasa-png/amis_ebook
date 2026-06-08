@@ -1,7 +1,6 @@
 @extends('layouts.app', ['title' => 'eBook Catalog'])
 
 @section('content')
-<script src="{{ asset('js/pdf.min.js') }}"></script>
 
 <div class="ebook-page">
     <header class="ebook-page-header">
@@ -150,67 +149,4 @@
     @endif
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const previews = Array.from(document.querySelectorAll('[data-pdf-preview]'));
-        if (!previews.length || !window.pdfjsLib) return;
-
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '{{ asset('js/pdf.worker.min.js') }}';
-
-        const renderPreview = async (canvas) => {
-            if (canvas.dataset.rendered === '1') return;
-            canvas.dataset.rendered = '1';
-
-            const cover = canvas.closest('.ebook-pdf-cover');
-            const context = canvas.getContext('2d');
-            let pdf = null;
-
-            try {
-                const loadingTask = pdfjsLib.getDocument({
-                    url: canvas.dataset.pdfPreview,
-                    disableAutoFetch: true
-                });
-                pdf = await loadingTask.promise;
-
-                const page = await pdf.getPage(1);
-                const baseViewport = page.getViewport({ scale: 1 });
-                const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-                const targetWidth = Math.max(220, Math.ceil((cover?.clientWidth || 240) * pixelRatio));
-                const viewport = page.getViewport({ scale: targetWidth / baseViewport.width });
-
-                canvas.width = Math.ceil(viewport.width);
-                canvas.height = Math.ceil(viewport.height);
-
-                await page.render({
-                    canvasContext: context,
-                    viewport
-                }).promise;
-
-                cover?.classList.add('is-loaded');
-            } catch (error) {
-                console.error('Failed to render eBook preview:', error);
-                cover?.classList.add('is-error');
-            } finally {
-                try {
-                    await pdf?.destroy?.();
-                } catch (error) {}
-            }
-        };
-
-        if ('IntersectionObserver' in window) {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (!entry.isIntersecting) return;
-                    observer.unobserve(entry.target);
-                    renderPreview(entry.target);
-                });
-            }, { rootMargin: '160px' });
-
-            previews.forEach((canvas) => observer.observe(canvas));
-            return;
-        }
-
-        previews.forEach(renderPreview);
-    });
-</script>
 @endsection

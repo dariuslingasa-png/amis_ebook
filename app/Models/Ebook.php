@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Ebook extends Model
 {
@@ -13,6 +14,7 @@ class Ebook extends Model
         'description',
         'grade_level',   // plain text, e.g. "Grade 4"
         'file_path',
+        'cover_image_path',
         'is_downloadable',
         'status',
         'created_by',
@@ -21,6 +23,18 @@ class Ebook extends Model
     protected $casts = [
         'is_downloadable' => 'boolean',
     ];
+
+    /**
+     * Get the public URL for the cover image.
+     */
+    public function getCoverUrlAttribute(): ?string
+    {
+        if (! $this->cover_image_path) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->cover_image_path);
+    }
 
     public function creator()
     {

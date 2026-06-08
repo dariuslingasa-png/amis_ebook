@@ -5,25 +5,32 @@ namespace App\Http\Controllers;
 use App\Models\Ebook;
 use App\Models\EbookAccessLog;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
     /**
-     * Show the public ebook catalog.
+     * Show the public ebook catalog with pagination.
      */
     public function index()
     {
         $user = Auth::user();
+        $isAdmin = $user?->role === 'admin';
 
-        if ($user?->role === 'admin') {
-            $books = Ebook::with('creator')->orderBy('title')->get();
+        $query = Ebook::select([
+            'id', 'title', 'description', 'grade_level',
+            'cover_image_path', 'is_downloadable', 'status',
+        ]);
+
+        if ($isAdmin) {
+            $query->orderBy('title');
         } else {
-            $books = Ebook::where('status', 'published')
-                ->orderBy('title')
-                ->get();
+            $query->where('status', 'published')->orderBy('title');
         }
+
+        $books = $query->get();
 
         return view('books.index', compact('books'));
     }
