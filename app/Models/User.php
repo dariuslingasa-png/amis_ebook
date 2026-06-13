@@ -60,4 +60,9 @@ class User extends Authenticatable
 
         return Subject::whereIn('name', $subjectNames)->get();
     }
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = mb_strtoupper($value, 'UTF-8');
+    }
 }
